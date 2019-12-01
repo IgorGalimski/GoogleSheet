@@ -5,18 +5,15 @@
       <e p="Assembly-CSharp-Editor.csproj" t="IncludeRecursive" />
       <e p="Assembly-CSharp.csproj" t="IncludeRecursive" />
       <e p="Assets" t="Include">
-        <e p="Google Sheets to Unity" t="Include">
-          <e p="Animal Example" t="Include">
-            <e p="Scripts" t="Include">
-              <e p="AnimalManager.cs" t="Include" />
-              <e p="AnimalObject.cs" t="Include" />
-              <e p="Scriptable Objects" t="Include">
-                <e p="Animal.cs" t="Include" />
-                <e p="AnimalContainer.cs" t="Include" />
-              </e>
-            </e>
+        <e p="Scripts" t="Include">
+          <e p="Data" t="Include">
+            <e p="GoogleData.cs" t="Include" />
+            <e p="GoogleDataStorage.cs" t="Include" />
           </e>
-          <e p="Scripts" t="Include">
+          <e p="Editor" t="Include">
+            <e p="GoogleDataStorageEditor.cs" t="Include" />
+          </e>
+          <e p="Google" t="Include">
             <e p="Editor" t="Include">
               <e p="GoogleSheetsToUnityEditorWindow.cs" t="Include" />
             </e>
@@ -44,16 +41,8 @@
               <e p="Spreadsheet.cs" t="Include" />
             </e>
           </e>
-        </e>
-        <e p="Scripts" t="Include">
-          <e p="Data" t="Include">
-            <e p="GoogleData.cs" t="Include" />
-            <e p="GoogleDataStorage.cs" t="Include" />
-          </e>
-          <e p="Editor" t="Include">
-            <e p="GoogleDataStorageEditor.cs" t="Include" />
-          </e>
           <e p="GoogleApi.cs" t="Include" />
+          <e p="UrlBuilder.cs" t="Include" />
         </e>
       </e>
       <e p="GoogleSheet.sln" t="IncludeFlat" />

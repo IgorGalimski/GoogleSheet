@@ -41,6 +41,11 @@ namespace DefaultNamespace.Editor
                     }
                 }
             }
+
+            if(GUILayout.Button("RefreshAccessTokenIfExpires"))
+            {
+                _googleDataStorage.RefreshAccessTokenIfExpires();
+            }
         }
     }
 }
