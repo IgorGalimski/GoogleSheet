@@ -15,7 +15,7 @@ namespace DefaultNamespace
         private readonly string _clientId;
         private readonly string _clientSecret;
         
-        private readonly OAuth2Parameters _parameters;
+        private OAuth2Parameters _parameters;
         
         public GoogleApi(string clientId, string clientSecret)
         {
@@ -27,7 +27,7 @@ namespace DefaultNamespace
         {
             try
             {
-                var _parameters = new OAuth2Parameters
+                _parameters = new OAuth2Parameters
                 {
                     ClientId = _clientId,
                     ClientSecret = _clientSecret,
@@ -46,24 +46,24 @@ namespace DefaultNamespace
             }
         }
 
-        public void GenerateAccessToken()
+        public (string accessToken, string refreshToken) GenerateAccessToken(string accessCode)
         {
             try
             {
                 ServicePointManager.ServerCertificateValidationCallback = RemoteCertificateValidationCallback;
 
-                _parameters.AccessCode = "_googleData.AccessCode";
+                _parameters.AccessCode = accessCode;
 
                 OAuthUtil.GetAccessToken(_parameters);
 
-                //_googleData.AccessToken = _parameters.AccessToken;
-                //_googleData.RefreshToken = _parameters.RefreshToken;
-                //_googleData.Email = GetEmail();
+                return (_parameters.AccessToken, _parameters.RefreshToken);
             }
             catch (Exception exception)
             {
                 Debug.LogWarningFormat("GenerateAccesToken exception: {0}", exception.Message);
             }
+
+            return (null, null);
         }
 
         private bool RemoteCertificateValidationCallback(System.Object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors sslPolicyErrors)
