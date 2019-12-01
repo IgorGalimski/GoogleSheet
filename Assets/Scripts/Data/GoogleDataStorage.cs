@@ -8,11 +8,6 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "GoogleDataStorage", menuName = "GoogleDataStorage")]
 public class GoogleDataStorage : ScriptableObject
 {
-    //todo move
-    private const string CHECK_TOKEN_EXPIRES = "https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=ACCESS_TOKEN";
-    private const string UPDATE_ACCESS_TOKEN =
-        "https://www.googleapis.com/oauth2/v4/token?client_id=CLIENT_ID&client_secret=CLIENT_SECRET&refresh_token=REFRESH_TOKEN&grant_type=refresh_token";
-    
     private const int REMAINING_TIME_TO_REFRESH_ACCESS_TOKEN = 30;
     
     [SerializeField] private string _apiKey;
@@ -70,10 +65,10 @@ public class GoogleDataStorage : ScriptableObject
 
     public async Task RefreshAccessTokenIfExpires()
     {
-        var url = new URLBuilder(CHECK_TOKEN_EXPIRES);
-        url.AddAccessToken(_accessToken);
+        var urlBuilder = URLBuilder.CheckTokenExpires().
+            AddAccessToken(_accessToken);
 
-        using (var response = await _httpClient.GetAsync(url.GetURL()))
+        using (var response = await _httpClient.GetAsync(urlBuilder.GetURL()))
         {
             var content = await response.Content.ReadAsStringAsync();
 
@@ -90,12 +85,13 @@ public class GoogleDataStorage : ScriptableObject
 
     private async Task RefreshAccessToken()
     {
-        var url = new URLBuilder(UPDATE_ACCESS_TOKEN);
-        url.AddCliendId(_clientId);
-        url.AddCliendSecret(_clientSecret);
-        url.AddRefreshToken(_refreshToken);
+        var urlBuilder = URLBuilder.UpdateAccessToken().
+            AddClientId(_clientId).
+            AddClientSecret(_clientSecret).
+            AddRefreshToken(_refreshToken).
+            AddGrantType("refresh_token");
 
-        using (var response = await _httpClient.PostAsync(url.GetURL(), null))
+        using (var response = await _httpClient.PostAsync(urlBuilder.GetURL(), null))
         {
             var content = await response.Content.ReadAsStringAsync();
             
