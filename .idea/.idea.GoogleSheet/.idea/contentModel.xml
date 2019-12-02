@@ -9,6 +9,7 @@
           <e p="Data" t="Include">
             <e p="GoogleDataStorage.cs" t="Include" />
             <e p="GoogleSheet.cs" t="Include" />
+            <e p="GoogleSheetRow.cs" t="Include" />
           </e>
           <e p="Editor" t="Include">
             <e p="GoogleDataStorageEditor.cs" t="Include" />

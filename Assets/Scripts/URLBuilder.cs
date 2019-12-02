@@ -11,6 +11,9 @@ namespace Google.GData.Client
             "https://www.googleapis.com/oauth2/v4/token?";
         
         private const string GET_SHEETS = "https://sheets.googleapis.com/v4/spreadsheets/";
+        
+        private const string GET_SHEETS_VALUES =
+            "https://sheets.googleapis.com/v4/spreadsheets/";
 
         private readonly StringBuilder _url; 
 
@@ -31,6 +34,11 @@ namespace Google.GData.Client
             return new URLBuilder(GET_SHEETS + spreadsheetId + "?");
         }
 
+        public static URLBuilder GetSheetsValues(string spreadsheetId)
+        {
+            return new URLBuilder(GET_SHEETS_VALUES + spreadsheetId + "/values:batchGet?");
+        }
+
         public URLBuilder(string baseUrl)
         {
             _url = new StringBuilder(baseUrl);
@@ -46,12 +54,14 @@ namespace Google.GData.Client
             //_url = _url.Replace("RANGE", range);
         }
         
-        public void AddRanges(IEnumerable<string> ranges)
+        public URLBuilder AddRanges(IEnumerable<string> ranges)
         {
-            foreach (string range in ranges)
+            foreach (var range in ranges)
             {
-                //_url = $"{_url}&ranges={range}";
+                _url.Append("ranges=" + range + "&");
             }
+
+            return this;
         }
 
         public void AddValueInputOption(string valueInputOption)
@@ -59,9 +69,11 @@ namespace Google.GData.Client
             //_url = _url.Replace("VALUE_INPUT_OPTION", valueInputOption);
         }
         
-        public void AddValueRenderOption(string valueRenderOption)
+        public URLBuilder AddValueRenderOption(string valueRenderOption)
         {
-            //_url = _url.Replace("VALUE_RENDER_OPTION", valueRenderOption);
+            _url.Append("valueRenderOption=" + valueRenderOption + "&");
+
+            return this;
         }
         
         public void AddKey(string key)

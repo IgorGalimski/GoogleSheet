@@ -47,8 +47,6 @@ public class GoogleDataStorage : ScriptableObject
         _accessToken = credentials.accessToken;
         _refreshToken = credentials.refreshToken;
 
-        _accessCode = null;
-
         Save();
     }
 
