@@ -20,7 +20,9 @@ public class GoogleDataStorage : ScriptableObject
 
     [Space(15)] [SerializeField] private string _accessCode;
 
-    [SerializeField] private string _accessToken;
+    [SerializeField] 
+    private string _accessToken;
+    public string AccessToken => _accessToken;
 
     [SerializeField] private string _refreshToken;
     

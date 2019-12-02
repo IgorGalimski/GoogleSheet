@@ -15,6 +15,8 @@ namespace Google.GData.Client
         private const string GET_SHEETS_VALUES =
             "https://sheets.googleapis.com/v4/spreadsheets/";
 
+        private const string GET_SPREADSHEETS = "https://www.googleapis.com/drive/v3/files?";
+
         private readonly StringBuilder _url; 
 
         private bool _isAnyFieldAdded;
@@ -37,6 +39,11 @@ namespace Google.GData.Client
         public static URLBuilder GetSheetsValues(string spreadsheetId)
         {
             return new URLBuilder(GET_SHEETS_VALUES + spreadsheetId + "/values:batchGet?");
+        }
+
+        public static URLBuilder GetSpreadsheets()
+        {
+            return new URLBuilder(GET_SPREADSHEETS);
         }
 
         public URLBuilder(string baseUrl)
@@ -128,14 +135,18 @@ namespace Google.GData.Client
             return this;
         }
 
-        public void AddOrder(string order)
+        public URLBuilder AddOrderBy(string orderBy)
         {
-            //_url = _url.Replace("ORDER_BY", order);
+            _url.Append("orderBy=" + orderBy + "&");
+            
+            return this;
         }
 
-        public void AddRequest(string request)
+        public URLBuilder AddRequest(string request)
         {
-            //_url = _url.Replace("REQUEST", request);
+            _url.Append("q=" + request + "&");
+
+            return this;
         }
 
         public string GetURL()

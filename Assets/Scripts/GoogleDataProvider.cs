@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Data;
 using Google.GData.Client;
@@ -20,8 +21,10 @@ namespace DefaultNamespace
         public async void Start()
         {
             await Init();
-            var result = await GetAllSheets("1Aw0mU10Dyj5AnhUyER8MEng5uNREHVcE4zyFa8Gncxw"); 
-            await GetSheetsValues("1Aw0mU10Dyj5AnhUyER8MEng5uNREHVcE4zyFa8Gncxw", result);
+
+            await GetAllSpreadsheets();
+            //var result = await GetAllSheets("1Aw0mU10Dyj5AnhUyER8MEng5uNREHVcE4zyFa8Gncxw"); 
+            //await GetSheetsValues("1Aw0mU10Dyj5AnhUyER8MEng5uNREHVcE4zyFa8Gncxw", result);
         }
 
         public async Task Init()
@@ -33,6 +36,40 @@ namespace DefaultNamespace
             }
 
             _googleDataProvider = (GoogleDataStorage) loadOperation.asset;
+        }
+
+        public async Task GetAllSpreadsheets()
+        {
+            await _googleDataProvider.RefreshAccessTokenIfExpires();
+            
+            var urlBuilder = URLBuilder.GetSpreadsheets().
+                            AddOrderBy("createdTime").
+                            //AddRequest("mimeType = 'application/vnd.google-apps.spreadsheet' and 'me' in owners and trashed = false");
+                            AddRequest("mimeType = 'application/vnd.google-apps.spreadsheet'");
+
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _googleDataProvider.AccessToken);
+            using (var response = await _httpClient.GetAsync(urlBuilder.GetURL()))
+            {
+                var content = await response.Content.ReadAsStringAsync();
+                
+                var jContainer = JsonConvert.DeserializeObject(content) as JContainer;
+
+                foreach (var jToken in jContainer)
+                {
+                    var jProperty = jToken as JProperty;
+
+                    if (jProperty.Name == "files")
+                    {
+                        foreach (var file in jProperty.Values())
+                        {
+                            var fileInfo = file as JObject;
+
+                            Debug.LogError(fileInfo["id"].ToString());
+                            //spreadsheets.Add(fileInfo["id"].ToString(), fileInfo["name"].ToString());
+                        }
+                    }
+                }
+            }
         }
 
         public async Task<ICollection<GoogleSheet>> GetAllSheets(string spreadsheetId)

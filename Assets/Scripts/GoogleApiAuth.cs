@@ -10,7 +10,9 @@ namespace DefaultNamespace
     public class GoogleApiAuth
     {
         private const string REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob";
-        private const string SCOPE = "https://www.googleapis.com/auth/spreadsheets";
+        private const string SCOPE = "https://www.googleapis.com/auth/spreadsheets " +
+                                     "https://www.googleapis.com/auth/userinfo.email " +
+                                     "https://www.googleapis.com/auth/drive.file";
 
         private readonly string _clientId;
         private readonly string _clientSecret;
