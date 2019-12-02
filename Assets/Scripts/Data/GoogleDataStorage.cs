@@ -10,7 +10,9 @@ public class GoogleDataStorage : ScriptableObject
 {
     private const int REMAINING_TIME_TO_REFRESH_ACCESS_TOKEN = 30;
     
-    [SerializeField] private string _apiKey;
+    [SerializeField] 
+    private string _apiKey;
+    public string ApiKey => _apiKey;
 
     [SerializeField] private string _clientId;
 
@@ -26,8 +28,8 @@ public class GoogleDataStorage : ScriptableObject
 
 #if UNITY_EDITOR
 
-    private GoogleApi _googleApi;
-    private GoogleApi GoogleApi => _googleApi ?? (_googleApi = new GoogleApi(_clientId, _clientSecret));
+    private GoogleApiAuth googleApiAuth;
+    private GoogleApiAuth GoogleApiAuth => googleApiAuth ?? (googleApiAuth = new GoogleApiAuth(_clientId, _clientSecret));
 
     public bool IsAuthStarted => !string.IsNullOrEmpty(_accessCode);
 
@@ -35,12 +37,12 @@ public class GoogleDataStorage : ScriptableObject
 
     public void StartAuth()
     {
-        GoogleApi.GenerateAccessCode();
+        GoogleApiAuth.GenerateAccessCode();
     }
 
     public void FinishAuth()
     {
-        var credentials = GoogleApi.GenerateAccessToken(_accessCode);
+        var credentials = GoogleApiAuth.GenerateAccessToken(_accessCode);
 
         _accessToken = credentials.accessToken;
         _refreshToken = credentials.refreshToken;

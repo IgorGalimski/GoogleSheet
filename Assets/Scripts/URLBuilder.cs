@@ -8,7 +8,9 @@ namespace Google.GData.Client
     {
         private const string CHECK_TOKEN_EXPIRES = "https://www.googleapis.com/oauth2/v1/tokeninfo?";
         private const string UPDATE_ACCESS_TOKEN =
-            "https://www.googleapis.com/oauth2/v4/token?client_id=CLIENT_ID&client_secret=CLIENT_SECRET&refresh_token=REFRESH_TOKEN&";
+            "https://www.googleapis.com/oauth2/v4/token?";
+        
+        private const string GET_SHEETS = "https://sheets.googleapis.com/v4/spreadsheets/";
 
         private readonly StringBuilder _url; 
 
@@ -22,6 +24,11 @@ namespace Google.GData.Client
         public static URLBuilder UpdateAccessToken()
         {
             return new URLBuilder(UPDATE_ACCESS_TOKEN);
+        }
+
+        public static URLBuilder GetSheets(string spreadsheetId)
+        {
+            return new URLBuilder(GET_SHEETS + spreadsheetId + "?");
         }
 
         public URLBuilder(string baseUrl)
@@ -47,11 +54,6 @@ namespace Google.GData.Client
             }
         }
 
-        public void AddFields(string fields)
-        {
-            //_url = _url.Replace("FIELDS", fields);
-        }
-        
         public void AddValueInputOption(string valueInputOption)
         {
             //_url = _url.Replace("VALUE_INPUT_OPTION", valueInputOption);
@@ -97,6 +99,20 @@ namespace Google.GData.Client
         {
             _url.Append("refresh_token=" + refreshToken + "&");
 
+            return this;
+        }
+
+        public URLBuilder AddApiKey(string apiKey)
+        {
+            _url.Append("key=" + apiKey + "&");
+            
+            return this;
+        }
+
+        public URLBuilder AddFields(string fields)
+        {
+            _url.Append("fields=" + fields + "&");
+            
             return this;
         }
 

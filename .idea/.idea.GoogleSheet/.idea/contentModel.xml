@@ -7,8 +7,8 @@
       <e p="Assets" t="Include">
         <e p="Scripts" t="Include">
           <e p="Data" t="Include">
-            <e p="GoogleData.cs" t="Include" />
             <e p="GoogleDataStorage.cs" t="Include" />
+            <e p="GoogleSheet.cs" t="Include" />
           </e>
           <e p="Editor" t="Include">
             <e p="GoogleDataStorageEditor.cs" t="Include" />
@@ -41,7 +41,8 @@
               <e p="Spreadsheet.cs" t="Include" />
             </e>
           </e>
-          <e p="GoogleApi.cs" t="Include" />
+          <e p="GoogleApiAuth.cs" t="Include" />
+          <e p="GoogleDataProvider.cs" t="Include" />
           <e p="UrlBuilder.cs" t="Include" />
         </e>
       </e>

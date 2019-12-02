@@ -1,15 +1,13 @@
 using System;
-using System.IO;
 using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using Google.GData.Client;
-using Newtonsoft.Json.Linq;
 using UnityEngine;
 
 namespace DefaultNamespace
 {
-    public class GoogleApi
+    public class GoogleApiAuth
     {
         private const string REDIRECT_URI = "urn:ietf:wg:oauth:2.0:oob";
         private const string SCOPE = "https://www.googleapis.com/auth/spreadsheets";
@@ -19,7 +17,7 @@ namespace DefaultNamespace
         
         private OAuth2Parameters _parameters;
         
-        public GoogleApi(string clientId, string clientSecret)
+        public GoogleApiAuth(string clientId, string clientSecret)
         {
             _clientId = clientId;
             _clientSecret = clientSecret;
