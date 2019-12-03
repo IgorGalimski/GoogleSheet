@@ -18,11 +18,20 @@ namespace Data
             Name = name;
         }
 
-        public GoogleSheetRow this[int index]
+        public object this[string range]
         {
             get
             {
-                return GoogleSheetRows.ElementAtOrDefault(index);
+                var columnIndex = char.ToUpper(range[0]) - 64;
+                var rowIndex = int.Parse(range[1].ToString());
+
+                var row = GoogleSheetRows.ElementAtOrDefault(rowIndex - 1);
+                if (row == null)
+                {
+                    return null;
+                }
+
+                return row[columnIndex - 1];
             }
         }
 

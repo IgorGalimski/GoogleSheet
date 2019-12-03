@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using System.Net.Http;
+using System.Linq;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Data;
@@ -14,21 +14,24 @@ namespace DefaultNamespace
     public class GoogleDataProvider : MonoBehaviour
     {
         private GoogleDataStorage _googleDataProvider;
-        private readonly HttpClient _httpClient = new HttpClient(new HttpClientHandler(), false);
+
+        public ICollection<GoogleSpreadsheet> GoogleSpreadsheets { get; private set; } = new List<GoogleSpreadsheet>();
+
+        public GoogleSpreadsheet this[string spreadsheetName]
+        {
+            get { return GoogleSpreadsheets.FirstOrDefault(item => item.Name.Equals(spreadsheetName)); }
+        }
 
         public async void Start()
         {
             await Init();
 
-            var googleSpreadsheets = await GetAllSpreadsheets();
-            foreach (var VARIABLE in googleSpreadsheets)
-            {
-                Debug.LogError(VARIABLE.ID + " " + VARIABLE.Name);
+            await LoadSpreadsheets();
 
-                await VARIABLE.LoadGoogleSheets();
-                
-                break;
-            }
+            var d = this["TestTable"];
+            await d.LoadGoogleSheets();
+            
+            Debug.LogError(d["List1"]["A1"]);
         }
 
         public async Task Init()
@@ -42,17 +45,17 @@ namespace DefaultNamespace
             _googleDataProvider = (GoogleDataStorage) loadOperation.asset;
         }
 
-        public async Task<ICollection<GoogleSpreadsheet>> GetAllSpreadsheets()
+        public async Task LoadSpreadsheets()
         {
             await _googleDataProvider.RefreshAccessTokenIfExpires();
-
-            var collection = new List<GoogleSpreadsheet>();
+            
+            GoogleSpreadsheets.Clear();
 
             var urlBuilder = URLBuilder.GetSpreadsheets().AddOrderBy("createdTime").
                             AddRequest("mimeType = 'application/vnd.google-apps.spreadsheet' and 'me' in owners and trashed = false");
 
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _googleDataProvider.AccessToken);
-            using (var response = await _httpClient.GetAsync(urlBuilder.GetURL()))
+            Utils.HttpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _googleDataProvider.AccessToken);
+            using (var response = await Utils.HttpClient.GetAsync(urlBuilder.GetURL()))
             {
                 var content = await response.Content.ReadAsStringAsync();
                 
@@ -68,13 +71,11 @@ namespace DefaultNamespace
                         {
                             var fileInfo = file as JObject;
 
-                            collection.Add(new GoogleSpreadsheet(fileInfo["id"].ToString(), fileInfo["name"].ToString(), _googleDataProvider));
+                            GoogleSpreadsheets.Add(new GoogleSpreadsheet(fileInfo["id"].ToString(), fileInfo["name"].ToString(), _googleDataProvider));
                         }
                     }
                 }
             }
-
-            return collection;
         }
     }
 }

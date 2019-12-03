@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
+using DefaultNamespace;
 using Google.GData.Client;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -43,7 +43,7 @@ namespace Data
                 .AddApiKey(_googleDataStorage.ApiKey)
                 .AddFields("sheets(properties(sheetId,title))");
             
-            using (var response = await new HttpClient().GetAsync(urlBuilder.GetURL()))
+            using (var response = await Utils.HttpClient.GetAsync(urlBuilder.GetURL()))
             {
                 var content = await response.Content.ReadAsStringAsync();
 
@@ -68,7 +68,7 @@ namespace Data
                 AddRanges(GoogleSheets.Select(item => item.Name)).
                 AddValueRenderOption("FORMULA");
 
-            using (var response = await new HttpClient().GetAsync(urlBuilder.GetURL()))
+            using (var response = await Utils.HttpClient.GetAsync(urlBuilder.GetURL()))
             {
                 var content = await response.Content.ReadAsStringAsync();
 

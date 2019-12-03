@@ -3,7 +3,6 @@ using System.Text;
 
 namespace Google.GData.Client
 {
-    //TODO Replace it
     public class URLBuilder
     {
         private const string CHECK_TOKEN_EXPIRES = "https://www.googleapis.com/oauth2/v1/tokeninfo?";
@@ -50,17 +49,7 @@ namespace Google.GData.Client
         {
             _url = new StringBuilder(baseUrl);
         }
-        
-        public void AddSpreadSheetId(string spreadsheetId)
-        {
-            //_url = _url.Replace("SPREADSHEET_ID", spreadsheetId);
-        }
 
-        public void AddRange(string range)
-        {
-            //_url = _url.Replace("RANGE", range);
-        }
-        
         public URLBuilder AddRanges(IEnumerable<string> ranges)
         {
             foreach (var range in ranges)
@@ -71,26 +60,11 @@ namespace Google.GData.Client
             return this;
         }
 
-        public void AddValueInputOption(string valueInputOption)
-        {
-            //_url = _url.Replace("VALUE_INPUT_OPTION", valueInputOption);
-        }
-        
         public URLBuilder AddValueRenderOption(string valueRenderOption)
         {
             _url.Append("valueRenderOption=" + valueRenderOption + "&");
 
             return this;
-        }
-        
-        public void AddKey(string key)
-        {
-            //_url = _url.Replace("KEY", key);
-        }
-
-        public void AddFileId(string fileId)
-        {
-            //_url = _url.Replace("FILE_ID", fileId);
         }
 
         public URLBuilder AddAccessToken(string accessToken)
@@ -149,16 +123,16 @@ namespace Google.GData.Client
             return this;
         }
 
-        public string GetURL()
-        {
-            return _url.ToString();
-        }
-
         public URLBuilder AddGrantType(string grantType)
         {
             _url.Append("grant_type=" + grantType + "&");
             
             return this;
+        }
+        
+        public string GetURL()
+        {
+            return _url.ToString();
         }
     }
 }

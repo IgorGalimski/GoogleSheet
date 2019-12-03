@@ -25,8 +25,6 @@ public class GoogleDataStorage : ScriptableObject
     public string AccessToken => _accessToken;
 
     [SerializeField] private string _refreshToken;
-    
-    private readonly HttpClient _httpClient = new HttpClient(new HttpClientHandler(), false);
 
 #if UNITY_EDITOR
 
@@ -70,7 +68,7 @@ public class GoogleDataStorage : ScriptableObject
         var urlBuilder = URLBuilder.CheckTokenExpires().
             AddAccessToken(_accessToken);
 
-        using (var response = await _httpClient.GetAsync(urlBuilder.GetURL()))
+        using (var response = await Utils.HttpClient.GetAsync(urlBuilder.GetURL()))
         {
             var content = await response.Content.ReadAsStringAsync();
 
@@ -93,7 +91,7 @@ public class GoogleDataStorage : ScriptableObject
             AddRefreshToken(_refreshToken).
             AddGrantType("refresh_token");
 
-        using (var response = await _httpClient.PostAsync(urlBuilder.GetURL(), null))
+        using (var response = await Utils.HttpClient.PostAsync(urlBuilder.GetURL(), null))
         {
             var content = await response.Content.ReadAsStringAsync();
             
