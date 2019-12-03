@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Data
 {
@@ -12,6 +13,11 @@ namespace Data
         {
             Index = index;
             Values = values;
+        }
+
+        public object this[int index]
+        {
+            get { return Values.ElementAtOrDefault(index); }
         }
     }
 }
