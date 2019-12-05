@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using DefaultNamespace;
 using Newtonsoft.Json.Linq;
 
 namespace Data
@@ -22,6 +23,11 @@ namespace Data
         {
             get
             {
+                if (string.IsNullOrEmpty(range) || range.Length != 2)
+                {
+                    throw new IncorrectRangeException($"Incorrect range {range}");
+                }
+                
                 var columnIndex = char.ToUpper(range[0]) - 64;
                 var rowIndex = int.Parse(range[1].ToString());
 
