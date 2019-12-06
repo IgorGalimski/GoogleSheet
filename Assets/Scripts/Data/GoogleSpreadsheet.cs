@@ -68,29 +68,26 @@ namespace Data
 
         public async Task CreateGoogleSheets(ICollection<string> names)
         {
-            BatchRequestBody requestData = new BatchRequestBody();
-            requestData.valueInputOption = ValueInputOption.USER_ENTERED;
-            var valueRange = new ValueRange();
-            valueRange.range = "List2!A1:Z1000";
-            valueRange.values = new List<List<object>>()
+            string json = @"{
+              'requests': [";
+            
+            string addSheetPattern = @"{
+                    'addSheet': {
+                        'properties': {
+                            'title': 'SHEET_NAME'
+                        }
+                    }
+            }";
+
+            foreach (string sheetName in names)
             {
-                new List<object>
-                {
-                    "TEST",
-                    "Test1"
-                },
-                new List<object>
-                {
-                   "2"
-                }
-            };
-            
-            requestData.data.Add(valueRange);
+                json += addSheetPattern.Replace("SHEET_NAME", sheetName);
+            }
 
-            //var json = JSON.Dump(requestData, EncodeOptions.NoTypeHints);
-            var json = JsonConvert.SerializeObject(requestData);
+            json += @"
+                ]
+            }";
 
-            
             var urlBuilder = URLBuilder.WriteMultipleRanges(ID)
                 .AddApiKey(_googleDataStorage.ApiKey)
                 .AddValueInputOption("USER_ENTERED");
@@ -101,6 +98,22 @@ namespace Data
             
             var content = new StringContent(json);
             
+            using (var response = await httpClient.PostAsync(urlBuilder.GetURL(), content))
+            {
+                Debug.LogError(response.StatusCode.ToString());
+            }
+        }
+
+        public async Task Clear()
+        {
+            var urlBuilder = URLBuilder.ClearSpreadsheets(ID);
+            
+            var httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _googleDataStorage.AccessToken);
+            
+            var content = new StringContent(JsonConvert.SerializeObject(ClearRequestBodyAdapter.GetClearRequestBody(GoogleSheets)));
+
             using (var response = await httpClient.PostAsync(urlBuilder.GetURL(), content))
             {
                 Debug.LogError(response.StatusCode.ToString());
