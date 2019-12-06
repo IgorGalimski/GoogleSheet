@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -13,7 +14,7 @@ using UnityEngine;
 
 namespace Data
 {
-    public class GoogleSpreadsheet
+    public class GoogleSpreadsheet : IEnumerable<GoogleSheet>
     {
         private readonly GoogleDataStorage _googleDataStorage;
         
@@ -65,6 +66,47 @@ namespace Data
             await ReadGoogleSheets();
         }
 
+        public async Task CreateGoogleSheets(ICollection<string> names)
+        {
+            BatchRequestBody requestData = new BatchRequestBody();
+            requestData.valueInputOption = ValueInputOption.USER_ENTERED;
+            var valueRange = new ValueRange();
+            valueRange.range = "List2!A1:Z1000";
+            valueRange.values = new List<List<object>>()
+            {
+                new List<object>
+                {
+                    "TEST",
+                    "Test1"
+                },
+                new List<object>
+                {
+                   "2"
+                }
+            };
+            
+            requestData.data.Add(valueRange);
+
+            //var json = JSON.Dump(requestData, EncodeOptions.NoTypeHints);
+            var json = JsonConvert.SerializeObject(requestData);
+
+            
+            var urlBuilder = URLBuilder.WriteMultipleRanges(ID)
+                .AddApiKey(_googleDataStorage.ApiKey)
+                .AddValueInputOption("USER_ENTERED");
+            
+            var httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _googleDataStorage.AccessToken);
+            
+            var content = new StringContent(json);
+            
+            using (var response = await httpClient.PostAsync(urlBuilder.GetURL(), content))
+            {
+                Debug.LogError(response.StatusCode.ToString());
+            }
+        }
+
         private async Task ReadGoogleSheets()
         {
             var urlBuilder = URLBuilder.GetSheetsValues(ID).
@@ -103,30 +145,24 @@ namespace Data
             var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _googleDataStorage.AccessToken);
-            
-            var content = new StringContent(GetGoogleSpreadSheetAsString(), Encoding.UTF8, "application/json");
 
-            var request = new HttpRequestMessage(HttpMethod.Post, urlBuilder.GetURL());
-            request.Content = content;
+            var batchRequestBody = JsonConvert.SerializeObject(GoogleSpreadsheetAdapter.GetBatchRequestBody(this));
             
-            using (var response = await httpClient.SendAsync(request))
-            {
-                Debug.LogError(response.StatusCode.ToString());
-            }
+            Debug.LogError(batchRequestBody);
+            
+            var content = new StringContent(batchRequestBody);
+
+            _ = await httpClient.PostAsync(urlBuilder.GetURL(), content);
         }
 
-        public string GetGoogleSpreadSheetAsString()
+        public IEnumerator<GoogleSheet> GetEnumerator()
         {
-            var requestsArray = new JArray();
+            return GoogleSheets.GetEnumerator();
+        }
 
-            foreach (var googleSheet in GoogleSheets)
-            {
-                requestsArray.Add(new JObject(googleSheet.GetGoogleSheetAsString()));
-            }
-            
-            var requestsProperty = new JProperty("requests", requestsArray);
-
-            return new JObject(requestsProperty).ToString();
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

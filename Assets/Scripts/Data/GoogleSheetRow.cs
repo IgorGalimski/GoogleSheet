@@ -1,10 +1,11 @@
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 
 namespace Data
 {
-    public class GoogleSheetRow
+    public class GoogleSheetRow : IEnumerable<object>
     {
         public int Index { get; private set; }
 
@@ -27,6 +28,16 @@ namespace Data
             var userEnteredValueProperty = new JProperty("userEnteredValue", new JObject(valueProperty));
             
             return new JObject(userEnteredValueProperty);
+        }
+
+        public IEnumerator<object> GetEnumerator()
+        {
+            return Values.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

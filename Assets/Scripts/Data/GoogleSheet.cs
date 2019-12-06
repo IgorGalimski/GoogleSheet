@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using DefaultNamespace;
@@ -6,7 +7,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Data
 {
-    public class GoogleSheet
+    public class GoogleSheet : IEnumerable<GoogleSheetRow>
     {
         public int ID { get; private set; }
         public string Name { get; private set; }
@@ -116,6 +117,16 @@ namespace Data
                     return new JValue(objString);
                 }
             }
+        }
+
+        public IEnumerator<GoogleSheetRow> GetEnumerator()
+        {
+            return GoogleSheetRows.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }
