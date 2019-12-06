@@ -69,21 +69,15 @@ namespace Data
         public async Task CreateGoogleSheets(ICollection<string> names)
         {
             string json = @"{
-              'requests': [";
+              'properties': [";
             
-            string addSheetPattern = @"{
+            json += @"{
                     'addSheet': {
                         'properties': {
-                            'title': 'SHEET_NAME'
+                            'title': '123'
                         }
                     }
             }";
-
-            foreach (string sheetName in names)
-            {
-                json += addSheetPattern.Replace("SHEET_NAME", sheetName);
-            }
-
             json += @"
                 ]
             }";
@@ -95,8 +89,12 @@ namespace Data
             var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _googleDataStorage.AccessToken);
+
+            json = JsonConvert.SerializeObject(AddSheetRequestBodyAdapter.GetAddSheetRequestBody(names));
             
             var content = new StringContent(json);
+            
+            Debug.LogError(json);
             
             using (var response = await httpClient.PostAsync(urlBuilder.GetURL(), content))
             {

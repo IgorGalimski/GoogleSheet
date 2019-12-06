@@ -5,6 +5,7 @@ namespace Google.GData.Client
 {
     public class URLBuilder
     {
+        //TODO clean up
         private const string CHECK_TOKEN_EXPIRES = "https://www.googleapis.com/oauth2/v1/tokeninfo?";
         private const string UPDATE_ACCESS_TOKEN =
             "https://www.googleapis.com/oauth2/v4/token?";
