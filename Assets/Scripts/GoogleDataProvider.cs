@@ -29,9 +29,10 @@ namespace DefaultNamespace
             await LoadSpreadsheets();
 
             var d = this["TestTable"];
-            await d.LoadGoogleSheets();
+            //await d.LoadGoogleSheets();
+            await d.Save();
             
-            Debug.LogError(d["List1"]["A1"]);
+            //Debug.LogError(d.GetGoogleSpreadSheetAsString());
         }
 
         public async Task Init()

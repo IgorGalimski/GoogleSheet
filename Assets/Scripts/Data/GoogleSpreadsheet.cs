@@ -1,11 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 using DefaultNamespace;
 using Google.GData.Client;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using UnityEngine;
 
 namespace Data
 {
@@ -61,7 +65,7 @@ namespace Data
             await ReadGoogleSheets();
         }
 
-        public async Task ReadGoogleSheets()
+        private async Task ReadGoogleSheets()
         {
             var urlBuilder = URLBuilder.GetSheetsValues(ID).
                 AddApiKey(_googleDataStorage.ApiKey).
@@ -88,6 +92,41 @@ namespace Data
                     GoogleSheets.ElementAt(i).Parse(valuesToken);
                 }
             }
+        }
+
+        public async Task Save()
+        {
+            var urlBuilder = URLBuilder.WriteMultipleRanges(ID)
+                .AddApiKey(_googleDataStorage.ApiKey)
+                .AddValueInputOption("USER_ENTERED");
+
+            var httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _googleDataStorage.AccessToken);
+            
+            var content = new StringContent(GetGoogleSpreadSheetAsString(), Encoding.UTF8, "application/json");
+
+            var request = new HttpRequestMessage(HttpMethod.Post, urlBuilder.GetURL());
+            request.Content = content;
+            
+            using (var response = await httpClient.SendAsync(request))
+            {
+                Debug.LogError(response.StatusCode.ToString());
+            }
+        }
+
+        public string GetGoogleSpreadSheetAsString()
+        {
+            var requestsArray = new JArray();
+
+            foreach (var googleSheet in GoogleSheets)
+            {
+                requestsArray.Add(new JObject(googleSheet.GetGoogleSheetAsString()));
+            }
+            
+            var requestsProperty = new JProperty("requests", requestsArray);
+
+            return new JObject(requestsProperty).ToString();
         }
     }
 }

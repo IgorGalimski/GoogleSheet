@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json.Linq;
 
 namespace Data
 {
@@ -18,6 +19,14 @@ namespace Data
         public object this[int index]
         {
             get { return Values.ElementAtOrDefault(index); }
+        }
+
+        public JObject GetValue()
+        {
+            var valueProperty = new JProperty("stringValue", "test");
+            var userEnteredValueProperty = new JProperty("userEnteredValue", new JObject(valueProperty));
+            
+            return new JObject(userEnteredValueProperty);
         }
     }
 }

@@ -57,6 +57,28 @@ namespace Data
                 GoogleSheetRows.Add(new GoogleSheetRow(i, row));
             }
         }
+
+        public JObject GetGoogleSheetAsString()
+        {
+            var startColumnIndexProperty = new JProperty("startColumnIndex", 0);
+            var endColumnIndexProperty = new JProperty("endColumnIndex", 1000);
+            var startRowIndexProperty = new JProperty("startRowIndex", 0);
+            var endRowIndexProperty = new JProperty("endRowIndex", 1000);
+            var sheetIdProperty = new JProperty("sheetId", ID);
+            var rangeProperty = new JProperty("range", new JObject(
+                startColumnIndexProperty, 
+                endColumnIndexProperty,
+                startRowIndexProperty,
+                endRowIndexProperty,
+                sheetIdProperty));
+            
+            var fieldsProperty = new JProperty("fields", "userEnteredValue");
+            var valuesProperty = new JProperty("values", GoogleSheetRows.Select(item => item.GetValue()));
+
+            var rowsProperty = new JProperty("rows", new JArray(new JObject(valuesProperty)));
+
+            return new JObject(rangeProperty, fieldsProperty, rowsProperty);
+        }
         
         private JValue GetJValueByGoogleSheetType(JToken obj)
         {

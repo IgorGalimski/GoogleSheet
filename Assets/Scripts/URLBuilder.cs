@@ -15,6 +15,9 @@ namespace Google.GData.Client
             "https://sheets.googleapis.com/v4/spreadsheets/";
 
         private const string GET_SPREADSHEETS = "https://www.googleapis.com/drive/v3/files?";
+        
+        private const string WRITE_MULTIPLE_RANGES =
+            "https://sheets.googleapis.com/v4/spreadsheets/";
 
         private readonly StringBuilder _url; 
 
@@ -43,6 +46,11 @@ namespace Google.GData.Client
         public static URLBuilder GetSpreadsheets()
         {
             return new URLBuilder(GET_SPREADSHEETS);
+        }
+
+        public static URLBuilder WriteMultipleRanges(string spreadsheetId)
+        {
+            return new URLBuilder(WRITE_MULTIPLE_RANGES + spreadsheetId + "/values:batchUpdate?");
         }
 
         public URLBuilder(string baseUrl)
@@ -129,7 +137,14 @@ namespace Google.GData.Client
             
             return this;
         }
-        
+
+        public URLBuilder AddValueInputOption(string valueInputOption)
+        {
+            _url.Append("valueInputOption=" + valueInputOption + "&");
+            
+            return this;
+        }
+
         public string GetURL()
         {
             return _url.ToString();
