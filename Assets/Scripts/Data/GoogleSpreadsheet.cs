@@ -68,9 +68,7 @@ namespace Data
 
         public async Task CreateGoogleSheets(ICollection<string> names)
         {
-            var urlBuilder = URLBuilder.WriteMultipleRanges(ID)
-                .AddApiKey(_googleDataStorage.ApiKey)
-                .AddValueInputOption("USER_ENTERED");
+            var urlBuilder = URLBuilder.WriteMultipleRanges(ID);
             
             var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -105,8 +103,6 @@ namespace Data
         public async Task DeleteGoogleSheets(ICollection<int> ids)
         {
             var urlBuilder = URLBuilder.WriteMultipleRanges(ID);
-                //.AddApiKey(_googleDataStorage.ApiKey)
-                //.AddValueInputOption("USER_ENTERED");
             
             var httpClient = new HttpClient();
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
@@ -30,7 +31,11 @@ namespace DefaultNamespace
 
             var d = this["TestTable"];
             await d.LoadGoogleSheets();
-            await d.DeleteGoogleSheets(new List<int>(){257596069, 451833770});
+            await d.CreateGoogleSheets(new List<string>()
+            {
+                "Create" + DateTime.UtcNow 
+            });
+            //await d.DeleteGoogleSheets(new List<int>(){257596069, 451833770});
         }
 
         public async Task Init()
