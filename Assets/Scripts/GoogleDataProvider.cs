@@ -30,8 +30,7 @@ namespace DefaultNamespace
 
             var d = this["TestTable"];
             await d.LoadGoogleSheets();
-            await d.Clear();
-            //await d.CreateGoogleSheets(new List<string>(){"123"});
+            await d.DeleteGoogleSheets(new List<int>(){257596069, 451833770});
         }
 
         public async Task Init()

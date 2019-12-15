@@ -43,11 +43,6 @@ namespace Data
             }
         }
 
-        public async Task Clear()
-        {
-            
-        }
-
         public void Parse(IEnumerable<JToken> valuesToken)
         {
             GoogleSheetRows.Clear();

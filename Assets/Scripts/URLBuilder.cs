@@ -53,7 +53,7 @@ namespace Google.GData.Client
 
         public static URLBuilder WriteMultipleRanges(string spreadsheetId)
         {
-            return new URLBuilder(WRITE_MULTIPLE_RANGES + spreadsheetId + "/values:batchUpdate?");
+            return new URLBuilder(WRITE_MULTIPLE_RANGES + spreadsheetId + ":batchUpdate");
         }
 
         public static URLBuilder ClearSpreadsheets(string spreadsheetId)

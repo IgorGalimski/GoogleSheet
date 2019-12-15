@@ -68,20 +68,6 @@ namespace Data
 
         public async Task CreateGoogleSheets(ICollection<string> names)
         {
-            string json = @"{
-              'properties': [";
-            
-            json += @"{
-                    'addSheet': {
-                        'properties': {
-                            'title': '123'
-                        }
-                    }
-            }";
-            json += @"
-                ]
-            }";
-
             var urlBuilder = URLBuilder.WriteMultipleRanges(ID)
                 .AddApiKey(_googleDataStorage.ApiKey)
                 .AddValueInputOption("USER_ENTERED");
@@ -90,12 +76,10 @@ namespace Data
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _googleDataStorage.AccessToken);
 
-            json = JsonConvert.SerializeObject(AddSheetRequestBodyAdapter.GetAddSheetRequestBody(names));
+            var json = JsonConvert.SerializeObject(AddSheetRequestBodyAdapter.GetAddSheetRequestBody(names));
             
             var content = new StringContent(json);
-            
-            Debug.LogError(json);
-            
+
             using (var response = await httpClient.PostAsync(urlBuilder.GetURL(), content))
             {
                 Debug.LogError(response.StatusCode.ToString());
@@ -111,6 +95,28 @@ namespace Data
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _googleDataStorage.AccessToken);
             
             var content = new StringContent(JsonConvert.SerializeObject(ClearRequestBodyAdapter.GetClearRequestBody(GoogleSheets)));
+
+            using (var response = await httpClient.PostAsync(urlBuilder.GetURL(), content))
+            {
+                Debug.LogError(response.StatusCode.ToString());
+            }
+        }
+
+        public async Task DeleteGoogleSheets(ICollection<int> ids)
+        {
+            var urlBuilder = URLBuilder.WriteMultipleRanges(ID);
+                //.AddApiKey(_googleDataStorage.ApiKey)
+                //.AddValueInputOption("USER_ENTERED");
+            
+            var httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _googleDataStorage.AccessToken);
+
+            var json = JsonConvert.SerializeObject(AddSheetRequestBodyAdapter.GetDeleteSheetRequestBody(ids));
+            
+            var content = new StringContent(json);
+            
+            Debug.LogError(json + " " + urlBuilder.GetURL());
 
             using (var response = await httpClient.PostAsync(urlBuilder.GetURL(), content))
             {
@@ -158,9 +164,7 @@ namespace Data
             httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _googleDataStorage.AccessToken);
 
             var batchRequestBody = JsonConvert.SerializeObject(GoogleSpreadsheetAdapter.GetBatchRequestBody(this));
-            
-            Debug.LogError(batchRequestBody);
-            
+
             var content = new StringContent(batchRequestBody);
 
             _ = await httpClient.PostAsync(urlBuilder.GetURL(), content);
