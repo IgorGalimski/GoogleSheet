@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 using DefaultNamespace;
 using Google.GData.Client;
@@ -18,8 +17,8 @@ namespace Data
     {
         private readonly GoogleDataStorage _googleDataStorage;
         
-        public string ID { get; private set; }
-        public string Name { get; private set; }
+        public string ID { get; }
+        public string Name { get; }
 
         public ICollection<GoogleSheet> GoogleSheets { get; private set; } = new List<GoogleSheet>();
 
@@ -80,7 +79,25 @@ namespace Data
 
             using (var response = await httpClient.PostAsync(urlBuilder.GetURL(), content))
             {
-                Debug.LogError(response.Content.ReadAsStringAsync().Result + " " +response.StatusCode.ToString());
+                if (response.IsSuccessStatusCode)
+                {
+                    var str = await response.Content.ReadAsStringAsync();
+                    
+                    var jObject = JObject.Parse(str);
+                    var replies = jObject["replies"];
+                    var repliesArray = replies.Select(t => t);
+
+                    foreach (var addSheet in repliesArray)
+                    {
+                        var properties = addSheet["addSheet"]["properties"];
+
+                        var id = properties["sheetId"];
+                        var title = properties["title"];
+                        
+                        var googleSheet = new GoogleSheet(id.Value<int>(), title.Value<string>());
+                        GoogleSheets.Add(googleSheet);
+                    }
+                }
             }
         }
 

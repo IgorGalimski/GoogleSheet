@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -36,17 +37,28 @@ namespace DefaultNamespace
 
         public async void Start()
         {
+            var str = File.ReadAllText(Application.dataPath + "/test.txt");
+            
+
+            
+            
+            //return;
             await Init();
 
             await LoadSpreadsheets();
 
             var d = this["TestTable"];
             await d.LoadGoogleSheets();
+            
+            Debug.LogError(d.GoogleSheets.Count);
 
             await d.CreateGoogleSheets(new List<string>()
             {
-                "Create" + DateTime.Now.ToLongTimeString()
+                "Create" + DateTime.Now.ToLongTimeString(),
+                "Create1" + DateTime.Now.ToLongTimeString()
             });
+            
+            Debug.LogError(d.GoogleSheets.Count);
 
             await d.DeleteGoogleSheets(new List<int>()
             {
