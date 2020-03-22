@@ -2,16 +2,14 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using DefaultNamespace;
 using Newtonsoft.Json.Linq;
 
 namespace Data
 {
     public class GoogleSheet : IEnumerable<GoogleSheetRow>
     {
-        public int ID { get; private set; }
-        public string Name { get; private set; }
+        public int ID { get; }
+        public string Name { get; }
         
         public ICollection<GoogleSheetRow> GoogleSheetRows { get; private set; } = new List<GoogleSheetRow>();
 
@@ -96,6 +94,11 @@ namespace Data
                 }
                 GoogleSheetRows.Add(new GoogleSheetRow(i, row));
             }
+        }
+        
+        public void Clear()
+        {
+            GoogleSheetRows.Clear();
         }
 
         private JValue GetJValueByGoogleSheetType(JToken obj)

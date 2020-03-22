@@ -38,10 +38,7 @@ namespace DefaultNamespace
         public async void Start()
         {
             var str = File.ReadAllText(Application.dataPath + "/test.txt");
-            
 
-            
-            
             //return;
             await Init();
 
@@ -51,19 +48,13 @@ namespace DefaultNamespace
             await d.LoadGoogleSheets();
             
             Debug.LogError(d.GoogleSheets.Count);
-
-            await d.CreateGoogleSheets(new List<string>()
+            
+            await d.DeleteGoogleSheets(new List<int>()
             {
-                "Create" + DateTime.Now.ToLongTimeString(),
-                "Create1" + DateTime.Now.ToLongTimeString()
+                553996091
             });
             
             Debug.LogError(d.GoogleSheets.Count);
-
-            await d.DeleteGoogleSheets(new List<int>()
-            {
-                924148453
-            });
 
             var spreadSheet = d["test_list"];
             spreadSheet["A1"].Value = "test" + DateTime.Now.ToLongTimeString();

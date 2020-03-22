@@ -40,8 +40,6 @@ namespace Data
         public async Task LoadGoogleSheets()
         {
             GoogleSheets.Clear();
-            
-            await _googleDataStorage.RefreshAccessTokenIfExpires();
 
             var urlBuilder = URLBuilder.GetSheets(ID)
                 .AddApiKey(_googleDataStorage.ApiKey)
@@ -68,78 +66,64 @@ namespace Data
         public async Task CreateGoogleSheets(ICollection<string> names)
         {
             var urlBuilder = URLBuilder.BatchUpdate(ID);
+            var value = AddSheetRequestBodyAdapter.GetAddSheetRequestBody(names);
             
-            var httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _googleDataStorage.AccessToken);
-
-            var json = JsonConvert.SerializeObject(AddSheetRequestBodyAdapter.GetAddSheetRequestBody(names));
-            
-            var content = new StringContent(json);
-
-            using (var response = await httpClient.PostAsync(urlBuilder.GetURL(), content))
+            var responseHandler = new Action<string>(str =>
             {
-                if (response.IsSuccessStatusCode)
+                var jObject = JObject.Parse(str);
+                var replies = jObject["replies"];
+                var repliesArray = replies.Select(t => t);
+
+                foreach (var addSheet in repliesArray)
                 {
-                    var str = await response.Content.ReadAsStringAsync();
-                    
-                    var jObject = JObject.Parse(str);
-                    var replies = jObject["replies"];
-                    var repliesArray = replies.Select(t => t);
+                    var properties = addSheet["addSheet"]["properties"];
 
-                    foreach (var addSheet in repliesArray)
-                    {
-                        var properties = addSheet["addSheet"]["properties"];
-
-                        var id = properties["sheetId"];
-                        var title = properties["title"];
+                    var id = properties["sheetId"];
+                    var title = properties["title"];
                         
-                        var googleSheet = new GoogleSheet(id.Value<int>(), title.Value<string>());
-                        GoogleSheets.Add(googleSheet);
-                    }
+                    var googleSheet = new GoogleSheet(id.Value<int>(), title.Value<string>());
+                    GoogleSheets.Add(googleSheet);
                 }
-            }
+                
+                Debug.Log(nameof(CreateGoogleSheets));
+            });
+
+            await SendRequestAsync(urlBuilder, value, responseHandler);
         }
 
         public async Task Clear()
         {
             var urlBuilder = URLBuilder.ClearSpreadsheets(ID);
-            
-            var httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _googleDataStorage.AccessToken);
-            
-            var content = new StringContent(JsonConvert.SerializeObject(ClearRequestBodyAdapter.GetClearRequestBody(GoogleSheets)));
+            var value = ClearRequestBodyAdapter.GetClearRequestBody(GoogleSheets);
 
-            using (var response = await httpClient.PostAsync(urlBuilder.GetURL(), content))
+            var responseHandler = new Action<string>(str =>
             {
-                Debug.LogError(response.StatusCode.ToString());
-            }
+                Debug.Log(nameof(Clear));
+
+                foreach (var googleSheet in GoogleSheets)
+                {
+                    googleSheet.Clear();
+                }
+            });
+
+            await SendRequestAsync(urlBuilder, value, responseHandler);
         }
 
         public async Task DeleteGoogleSheets(ICollection<int> ids)
         {
             var urlBuilder = URLBuilder.BatchUpdate(ID);
-            
-            var httpClient = new HttpClient();
-            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _googleDataStorage.AccessToken);
+            var value = AddSheetRequestBodyAdapter.GetDeleteSheetRequestBody(ids);
 
-            var json = JsonConvert.SerializeObject(AddSheetRequestBodyAdapter.GetDeleteSheetRequestBody(ids));
-            
-            var content = new StringContent(json);
-
-            using (var response = await httpClient.PostAsync(urlBuilder.GetURL(), content))
+            var responseHandler = new Action<string>(str =>
             {
-                if (response.IsSuccessStatusCode)
+                foreach (var id in ids)
                 {
-                    foreach (var id in ids)
-                    {
-                        var googleSheet = GoogleSheets.First(item => item.ID == id);
-                        GoogleSheets.Remove(googleSheet);
-                    }
+                    var googleSheet = GoogleSheets.First(item => item.ID == id);
+                    GoogleSheets.Remove(googleSheet);
                 }
-            }
+            });
+
+            await SendRequestAsync(urlBuilder, value, responseHandler);
         }
 
         private async Task ReadGoogleSheets()
@@ -176,17 +160,36 @@ namespace Data
             var urlBuilder = URLBuilder.WriteMultipleRanges(ID)
                 .AddApiKey(_googleDataStorage.ApiKey)
                 .AddValueInputOption("USER_ENTERED");
+            var value = GoogleSpreadsheetAdapter.GetBatchRequestBody(this);
 
-            var httpClient = new HttpClient();
+            var responseHandler = new Action<string>(str =>
+            {
+                Debug.Log(nameof(Save));
+            });
+
+            await SendRequestAsync(urlBuilder, value, responseHandler);
+        }
+        
+        private async Task SendRequestAsync(URLBuilder urlBuilder, object value, Action<string> responseHandler)
+        {
+            var httpClient = Utils.HttpClient;
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _googleDataStorage.AccessToken);
+            httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", _googleDataStorage.AccessToken);
 
-            var batchRequestBody = JsonConvert.SerializeObject(GoogleSpreadsheetAdapter.GetBatchRequestBody(this));
+            var json = JsonConvert.SerializeObject(value);
 
-            var content = new StringContent(batchRequestBody);
-            
-            var response = await httpClient.PostAsync(urlBuilder.GetURL(), content);
-            Debug.Log("Save: " + response.StatusCode);
+            var content = new StringContent(json);
+
+            using (var response = await httpClient.PostAsync(urlBuilder.GetURL(), content))
+            {
+                if (response.IsSuccessStatusCode)
+                {
+                    var str = await response.Content.ReadAsStringAsync();
+                    
+                    responseHandler.Invoke(str);
+                }
+            }
         }
 
         public IEnumerator<GoogleSheet> GetEnumerator()
