@@ -43,6 +43,19 @@ namespace DefaultNamespace
             var d = this["TestTable"];
             await d.LoadGoogleSheets();
 
+            await d.CreateGoogleSheets(new List<string>()
+            {
+                "Create" + DateTime.Now.ToLongTimeString()
+            });
+
+            await d.DeleteGoogleSheets(new List<int>()
+            {
+                924148453
+            });
+
+            var spreadSheet = d["test_list"];
+            spreadSheet["A1"].Value = "test" + DateTime.Now.ToLongTimeString();
+
             await d.Save();
         }
 
