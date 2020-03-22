@@ -131,7 +131,14 @@ namespace Data
 
             using (var response = await httpClient.PostAsync(urlBuilder.GetURL(), content))
             {
-                Debug.LogError(response.StatusCode.ToString());
+                if (response.IsSuccessStatusCode)
+                {
+                    foreach (var id in ids)
+                    {
+                        var googleSheet = GoogleSheets.First(item => item.ID == id);
+                        GoogleSheets.Remove(googleSheet);
+                    }
+                }
             }
         }
 
