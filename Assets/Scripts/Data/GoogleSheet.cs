@@ -21,26 +21,59 @@ namespace Data
             Name = name;
         }
 
-        public object this[string range]
+        public GoogleSheetCell this[string range]
         {
             get
             {
-                if (string.IsNullOrEmpty(range) || range.Length != 2)
+                if (TryGetCell(range, out var googleSheetCell))
                 {
-                    throw new IncorrectRangeException($"Incorrect range {range}");
-                }
-                
-                var columnIndex = char.ToUpper(range[0]) - 64;
-                var rowIndex = int.Parse(range[1].ToString());
-
-                var row = GoogleSheetRows.ElementAtOrDefault(rowIndex - 1);
-                if (row == null)
-                {
-                    return null;
+                    return googleSheetCell;
                 }
 
-                return row[columnIndex - 1];
+                return null;
             }
+            set
+            {
+                if (TryGetCell(range, out var googleSheetCell))
+                {
+                    googleSheetCell.Value = value;
+                }
+            }
+        }
+
+        private bool TryGetCell(string range, out GoogleSheetCell googleSheetCell)
+        {
+            googleSheetCell = null;
+            
+            if (TryParseRange(range, out var columnIndex, out var rowIndex))
+            {
+                var row = GoogleSheetRows.ElementAtOrDefault(rowIndex - 1);
+                if (row != null)
+                {
+                    googleSheetCell = row[columnIndex - 1];
+
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool TryParseRange(string range, out int columnIndex, out int rowIndex)
+        {
+            columnIndex = -1;
+            rowIndex = -1;
+
+            if (!string.IsNullOrEmpty(range) && range.Length == 2)
+            {
+                columnIndex = char.ToUpper(range[0]) - 64;
+                if (int.TryParse(range[1].ToString(), out rowIndex))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public void Parse(IEnumerable<JToken> valuesToken)
@@ -51,10 +84,15 @@ namespace Data
             {
                 var jToken = valuesToken.ElementAt(i);
                 
-                var row = new List<object>();
+                var row = new List<GoogleSheetCell>();
                 foreach (var value in jToken)
                 {
-                    row.Add(GetJValueByGoogleSheetType(value));
+                    var cell = new GoogleSheetCell
+                    {
+                        Value = GetJValueByGoogleSheetType(value)
+                    };
+
+                    row.Add(cell);
                 }
                 GoogleSheetRows.Add(new GoogleSheetRow(i, row));
             }

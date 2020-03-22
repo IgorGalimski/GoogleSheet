@@ -7,8 +7,10 @@
       <e p="Assets" t="Include">
         <e p="Scripts" t="Include">
           <e p="Data" t="Include">
+            <e p="BatchRequestBody.cs" t="Include" />
             <e p="GoogleDataStorage.cs" t="Include" />
             <e p="GoogleSheet.cs" t="Include" />
+            <e p="GoogleSheetCell.cs" t="Include" />
             <e p="GoogleSheetRow.cs" t="Include" />
             <e p="GoogleSpreadsheet.cs" t="Include" />
           </e>
@@ -46,6 +48,10 @@
           <e p="GoogleApiAuth.cs" t="Include" />
           <e p="GoogleDataProvider.cs" t="Include" />
           <e p="UrlBuilder.cs" t="Include" />
+          <e p="Utils" t="Include">
+            <e p="GoogleSpreadsheetAdapter.cs" t="Include" />
+          </e>
+          <e p="Utils.cs" t="Include" />
         </e>
       </e>
       <e p="GoogleSheet.sln" t="IncludeFlat" />

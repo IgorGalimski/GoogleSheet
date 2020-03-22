@@ -162,8 +162,9 @@ namespace Data
             var batchRequestBody = JsonConvert.SerializeObject(GoogleSpreadsheetAdapter.GetBatchRequestBody(this));
 
             var content = new StringContent(batchRequestBody);
-
-            _ = await httpClient.PostAsync(urlBuilder.GetURL(), content);
+            
+            var response = await httpClient.PostAsync(urlBuilder.GetURL(), content);
+            Debug.Log("Save: " + response.StatusCode);
         }
 
         public IEnumerator<GoogleSheet> GetEnumerator()

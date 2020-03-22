@@ -5,22 +5,19 @@ using Newtonsoft.Json.Linq;
 
 namespace Data
 {
-    public class GoogleSheetRow : IEnumerable<object>
+    public class GoogleSheetRow : IEnumerable<GoogleSheetCell>
     {
-        public int Index { get; private set; }
+        public int Index { get; }
 
-        public ICollection<object> Values { get; private set; }
+        public ICollection<GoogleSheetCell> Values { get; }
 
-        public GoogleSheetRow(int index, ICollection<object> values)
+        public GoogleSheetRow(int index, ICollection<GoogleSheetCell> values)
         {
             Index = index;
             Values = values;
         }
 
-        public object this[int index]
-        {
-            get { return Values.ElementAtOrDefault(index); }
-        }
+        public GoogleSheetCell this[int index] => Values.ElementAtOrDefault(index);
 
         public JObject GetValue()
         {
@@ -30,7 +27,7 @@ namespace Data
             return new JObject(userEnteredValueProperty);
         }
 
-        public IEnumerator<object> GetEnumerator()
+        public IEnumerator<GoogleSheetCell> GetEnumerator()
         {
             return Values.GetEnumerator();
         }

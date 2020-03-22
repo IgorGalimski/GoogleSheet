@@ -19,9 +19,9 @@ namespace DefaultNamespace
                 {
                     var row = new List<object>();
                     
-                    foreach (var value in googleSheetRow)
+                    foreach (var googleSheetCell in googleSheetRow)
                     {
-                        row.Add(value);
+                        row.Add(googleSheetCell.Value);
                     }
                     
                     valueRange.Add(row);
