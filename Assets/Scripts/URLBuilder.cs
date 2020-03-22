@@ -61,7 +61,7 @@ namespace Google.GData.Client
             return new URLBuilder(CLEAR_RANGE + spreadsheetId + "/values:batchClear?");
         }
 
-        public URLBuilder(string baseUrl)
+        private URLBuilder(string baseUrl)
         {
             _url = new StringBuilder(baseUrl);
         }

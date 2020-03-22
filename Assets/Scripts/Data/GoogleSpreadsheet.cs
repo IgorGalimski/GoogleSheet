@@ -111,8 +111,6 @@ namespace Data
             var json = JsonConvert.SerializeObject(AddSheetRequestBodyAdapter.GetDeleteSheetRequestBody(ids));
             
             var content = new StringContent(json);
-            
-            Debug.LogError(json + " " + urlBuilder.GetURL());
 
             using (var response = await httpClient.PostAsync(urlBuilder.GetURL(), content))
             {

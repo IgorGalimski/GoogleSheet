@@ -14,6 +14,17 @@ namespace DefaultNamespace
     [ExecuteInEditMode]
     public class GoogleDataProvider : MonoBehaviour
     {
+        //TBD
+        /*
+         *Load tables +
+         *Load spreadsheets +
+         *Clear +
+         *Create +
+         *Set value
+         *Delete +
+         *Save
+         */
+        
         private GoogleDataStorage _googleDataProvider;
 
         public ICollection<GoogleSpreadsheet> GoogleSpreadsheets { get; private set; } = new List<GoogleSpreadsheet>();
