@@ -15,18 +15,15 @@ namespace Data
 {
     public class GoogleSpreadsheet : IEnumerable<GoogleSheet>
     {
-        private readonly GoogleDataStorage _googleDataStorage;
-        
         public string ID { get; }
         public string Name { get; }
 
         public ICollection<GoogleSheet> GoogleSheets { get; private set; } = new List<GoogleSheet>();
 
-        public GoogleSpreadsheet(string id, string name, GoogleDataStorage googleDataStorage)
+        public GoogleSpreadsheet(string id, string name)
         {
             ID = id;
             Name = name;
-            _googleDataStorage = googleDataStorage;
         }
 
         public GoogleSheet this[string sheetName]
@@ -42,7 +39,7 @@ namespace Data
             GoogleSheets.Clear();
 
             var urlBuilder = URLBuilder.GetSheets(ID)
-                .AddApiKey(_googleDataStorage.ApiKey)
+                .AddApiKey(GoogleDataStorage.Instance.ApiKey)
                 .AddFields("sheets(properties(sheetId,title))");
             
             using (var response = await Utils.HttpClient.GetAsync(urlBuilder.GetURL()))
@@ -116,6 +113,8 @@ namespace Data
 
             var responseHandler = new Action<string>(str =>
             {
+                Debug.Log(nameof(DeleteGoogleSheets));
+                
                 foreach (var id in ids)
                 {
                     var googleSheet = GoogleSheets.First(item => item.ID == id);
@@ -129,7 +128,7 @@ namespace Data
         private async Task ReadGoogleSheets()
         {
             var urlBuilder = URLBuilder.GetSheetsValues(ID).
-                AddApiKey(_googleDataStorage.ApiKey).
+                AddApiKey(GoogleDataStorage.Instance.ApiKey).
                 AddRanges(GoogleSheets.Select(item => item.Name)).
                 AddValueRenderOption("FORMULA");
 
@@ -158,7 +157,7 @@ namespace Data
         public async Task Save()
         {
             var urlBuilder = URLBuilder.WriteMultipleRanges(ID)
-                .AddApiKey(_googleDataStorage.ApiKey)
+                .AddApiKey(GoogleDataStorage.Instance.ApiKey)
                 .AddValueInputOption("USER_ENTERED");
             var value = GoogleSpreadsheetAdapter.GetBatchRequestBody(this);
 
@@ -175,7 +174,7 @@ namespace Data
             var httpClient = Utils.HttpClient;
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", _googleDataStorage.AccessToken);
+                new AuthenticationHeaderValue("Bearer", GoogleDataStorage.Instance.AccessToken);
 
             var json = JsonConvert.SerializeObject(value);
 

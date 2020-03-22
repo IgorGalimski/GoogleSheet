@@ -1,5 +1,4 @@
-﻿using System.Net.Http;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using DefaultNamespace;
 using Google.GData.Client;
 using Newtonsoft.Json.Linq;
@@ -9,6 +8,21 @@ using UnityEngine;
 public class GoogleDataStorage : ScriptableObject
 {
     private const int REMAINING_TIME_TO_REFRESH_ACCESS_TOKEN = 30;
+
+    private static GoogleDataStorage _instance;
+
+    public static GoogleDataStorage Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = Resources.Load<GoogleDataStorage>(nameof(Instance));
+            }
+
+            return _instance;
+        }
+    }
     
     [SerializeField] 
     private string _apiKey;
