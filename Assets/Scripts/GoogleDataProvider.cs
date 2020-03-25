@@ -6,11 +6,10 @@ using Data;
 using Google.GData.Client;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using UnityEngine;
 
 namespace DefaultNamespace
 {
-    public class GoogleDataProvider : MonoBehaviour
+    public class GoogleDataProvider
     { 
         public ICollection<GoogleSpreadsheet> GoogleSpreadsheets { get; private set; } = new List<GoogleSpreadsheet>();
 

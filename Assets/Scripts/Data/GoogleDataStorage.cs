@@ -17,7 +17,7 @@ public class GoogleDataStorage : ScriptableObject
         {
             if (_instance == null)
             {
-                _instance = Resources.Load<GoogleDataStorage>(nameof(Instance));
+                _instance = Resources.Load<GoogleDataStorage>(nameof(GoogleDataStorage));
             }
 
             return _instance;
