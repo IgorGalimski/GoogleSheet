@@ -21,6 +21,8 @@ namespace Google.GData.Client
             "https://sheets.googleapis.com/v4/spreadsheets/";
         
         private const string CLEAR_RANGE = "https://sheets.googleapis.com/v4/spreadsheets/";
+        
+        private const string CREATE_SPREADSHEET = "https://sheets.googleapis.com/v4/spreadsheets";
 
         private readonly StringBuilder _url; 
 
@@ -64,6 +66,11 @@ namespace Google.GData.Client
         public static URLBuilder ClearSpreadsheets(string spreadsheetId)
         {
             return new URLBuilder(CLEAR_RANGE + spreadsheetId + "/values:batchClear?");
+        }
+
+        public static URLBuilder CreateSpreadSheet()
+        {
+            return new URLBuilder(CREATE_SPREADSHEET);
         }
 
         private URLBuilder(string baseUrl)

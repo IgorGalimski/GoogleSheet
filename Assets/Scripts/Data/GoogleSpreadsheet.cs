@@ -2,8 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using DefaultNamespace;
 using Google.GData.Client;
@@ -85,7 +83,7 @@ namespace Data
                 Debug.Log(nameof(CreateGoogleSheets));
             });
 
-            await SendRequestAsync(urlBuilder, value, responseHandler);
+            await RequestExecutor.SendRequestAsync(urlBuilder, value, responseHandler);
         }
 
         public async Task Clear()
@@ -103,7 +101,7 @@ namespace Data
                 }
             });
 
-            await SendRequestAsync(urlBuilder, value, responseHandler);
+            await RequestExecutor.SendRequestAsync(urlBuilder, value, responseHandler);
         }
 
         public async Task DeleteGoogleSheets(ICollection<int> ids)
@@ -122,7 +120,7 @@ namespace Data
                 }
             });
 
-            await SendRequestAsync(urlBuilder, value, responseHandler);
+            await RequestExecutor.SendRequestAsync(urlBuilder, value, responseHandler);
         }
 
         private async Task ReadGoogleSheets()
@@ -166,29 +164,7 @@ namespace Data
                 Debug.Log(nameof(Save));
             });
 
-            await SendRequestAsync(urlBuilder, value, responseHandler);
-        }
-        
-        private async Task SendRequestAsync(URLBuilder urlBuilder, object value, Action<string> responseHandler)
-        {
-            var httpClient = Utils.HttpClient;
-            httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-            httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue("Bearer", GoogleDataStorage.Instance.AccessToken);
-
-            var json = JsonConvert.SerializeObject(value);
-
-            var content = new StringContent(json);
-
-            using (var response = await httpClient.PostAsync(urlBuilder.GetURL(), content))
-            {
-                if (response.IsSuccessStatusCode)
-                {
-                    var str = await response.Content.ReadAsStringAsync();
-                    
-                    responseHandler.Invoke(str);
-                }
-            }
+            await RequestExecutor.SendRequestAsync(urlBuilder, value, responseHandler);
         }
 
         public IEnumerator<GoogleSheet> GetEnumerator()

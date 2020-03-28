@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
@@ -6,6 +7,7 @@ using Data;
 using Google.GData.Client;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using UnityEngine;
 
 namespace DefaultNamespace
 {
@@ -16,6 +18,18 @@ namespace DefaultNamespace
         public GoogleSpreadsheet this[string spreadsheetName]
         {
             get { return GoogleSpreadsheets.FirstOrDefault(item => item.Name.Equals(spreadsheetName)); }
+        }
+
+        public async Task CreateSpreadsheet(string spreadsheetName)
+        {
+            var urlBuilder = URLBuilder.CreateSpreadSheet();
+            var spreadsheetCreateRequest = new SpreadsheetCreateRequest(spreadsheetName);
+            var responseHandler = new Action<string>(str =>
+            {
+                Debug.Log(nameof(CreateSpreadsheet) + spreadsheetName);
+            });
+
+            await RequestExecutor.SendRequestAsync(urlBuilder, spreadsheetCreateRequest, responseHandler);
         }
         
         public async Task LoadSpreadsheets()
