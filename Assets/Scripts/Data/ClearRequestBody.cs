@@ -9,7 +9,7 @@ namespace Data
 
     public static class ClearRequestBodyAdapter
     {
-        public static ClearRequestBody GetClearRequestBody(ICollection<GoogleSheet> googleSheets)
+        public static ClearRequestBody GetClearRequestBody(ICollection<Sheet> googleSheets)
         {
             var clearRequestBody = new ClearRequestBody();
 

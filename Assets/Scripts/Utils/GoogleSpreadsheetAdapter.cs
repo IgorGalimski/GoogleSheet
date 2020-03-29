@@ -6,16 +6,16 @@ namespace DefaultNamespace
     public static class GoogleSpreadsheetAdapter
     {
         //TODO Optimize
-        public static BatchRequestBody GetBatchRequestBody(GoogleSpreadsheet googleSpreadsheet)
+        public static BatchRequestBody GetBatchRequestBody(Spreadsheet spreadsheet)
         {
             var requestData = new BatchRequestBody();
 
-            foreach (var googleSheet in googleSpreadsheet)
+            foreach (var googleSheet in spreadsheet)
             {
                 var valueRange = new ValueRange();
                 valueRange.range = googleSheet.Name + "!A1:Z1000";
                 
-                foreach (var googleSheetRow in googleSheet.GoogleSheetRows)
+                foreach (var googleSheetRow in googleSheet.Rows)
                 {
                     var row = new List<object>();
                     

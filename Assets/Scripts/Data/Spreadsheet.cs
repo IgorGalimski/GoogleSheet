@@ -11,30 +11,30 @@ using UnityEngine;
 
 namespace Data
 {
-    public class GoogleSpreadsheet : IEnumerable<GoogleSheet>
+    public class Spreadsheet : IEnumerable<Sheet>
     {
         public string ID { get; }
         public string Name { get; }
 
-        public ICollection<GoogleSheet> GoogleSheets { get; private set; } = new List<GoogleSheet>();
+        public ICollection<Sheet> Sheets { get; private set; } = new List<Sheet>();
 
-        public GoogleSpreadsheet(string id, string name)
+        public Spreadsheet(string id, string name)
         {
             ID = id;
             Name = name;
         }
 
-        public GoogleSheet this[string sheetName]
+        public Sheet this[string sheetName]
         {
             get
             {
-                return GoogleSheets.FirstOrDefault(item => item.Name.Equals(sheetName));
+                return Sheets.FirstOrDefault(item => item.Name.Equals(sheetName));
             }
         }
 
         public async Task LoadGoogleSheets()
         {
-            GoogleSheets.Clear();
+            Sheets.Clear();
 
             var urlBuilder = URLBuilder.GetSheets(ID)
                 .AddApiKey(GoogleDataStorage.Instance.ApiKey)
@@ -51,7 +51,7 @@ namespace Data
 
                 foreach (var sheet in sheetInfo)
                 {
-                    GoogleSheets.Add(new GoogleSheet(Convert.ToInt32(sheet.id.ToString()), sheet.title.ToString()));
+                    Sheets.Add(new Sheet(Convert.ToInt32(sheet.id.ToString()), sheet.title.ToString()));
                 }
             }
 
@@ -76,8 +76,8 @@ namespace Data
                     var id = properties["sheetId"];
                     var title = properties["title"];
                         
-                    var googleSheet = new GoogleSheet(id.Value<int>(), title.Value<string>());
-                    GoogleSheets.Add(googleSheet);
+                    var googleSheet = new Sheet(id.Value<int>(), title.Value<string>());
+                    Sheets.Add(googleSheet);
                 }
                 
                 Debug.Log(nameof(CreateSheets) + string.Concat(names, "\n"));
@@ -89,13 +89,13 @@ namespace Data
         public async Task Clear()
         {
             var urlBuilder = URLBuilder.ClearSpreadsheets(ID);
-            var value = ClearRequestBodyAdapter.GetClearRequestBody(GoogleSheets);
+            var value = ClearRequestBodyAdapter.GetClearRequestBody(Sheets);
 
             var responseHandler = new Action<string>(str =>
             {
                 Debug.Log(nameof(Clear));
 
-                foreach (var googleSheet in GoogleSheets)
+                foreach (var googleSheet in Sheets)
                 {
                     googleSheet.Clear();
                 }
@@ -115,8 +115,8 @@ namespace Data
                 
                 foreach (var id in ids)
                 {
-                    var googleSheet = GoogleSheets.First(item => item.ID == id);
-                    GoogleSheets.Remove(googleSheet);
+                    var googleSheet = Sheets.First(item => item.ID == id);
+                    Sheets.Remove(googleSheet);
                 }
             });
 
@@ -127,7 +127,7 @@ namespace Data
         {
             var urlBuilder = URLBuilder.GetSheetsValues(ID).
                 AddApiKey(GoogleDataStorage.Instance.ApiKey).
-                AddRanges(GoogleSheets.Select(item => item.Name)).
+                AddRanges(Sheets.Select(item => item.Name)).
                 AddValueRenderOption("FORMULA");
 
             using (var response = await Utils.HttpClient.GetAsync(urlBuilder.GetURL()))
@@ -147,7 +147,7 @@ namespace Data
                     
                     var valuesToken = range["values"].Select(t => t);
 
-                    GoogleSheets.ElementAt(i).Parse(valuesToken);
+                    Sheets.ElementAt(i).Parse(valuesToken);
                 }
             }
         }
@@ -167,9 +167,9 @@ namespace Data
             await RequestExecutor.SendRequestAsync(urlBuilder, value, responseHandler);
         }
 
-        public IEnumerator<GoogleSheet> GetEnumerator()
+        public IEnumerator<Sheet> GetEnumerator()
         {
-            return GoogleSheets.GetEnumerator();
+            return Sheets.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()

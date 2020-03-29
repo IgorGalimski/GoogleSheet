@@ -4,13 +4,13 @@ using System.Linq;
 
 namespace Data
 {
-    public class GoogleSheetRow : IEnumerable<Cell>
+    public class Row : IEnumerable<Cell>
     {
         public int Index { get; }
 
         public ICollection<Cell> Values { get; }
 
-        public GoogleSheetRow(int index, ICollection<Cell> values)
+        public Row(int index, ICollection<Cell> values)
         {
             Index = index;
             Values = values;

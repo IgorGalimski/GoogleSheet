@@ -6,14 +6,14 @@ using Newtonsoft.Json.Linq;
 
 namespace Data
 {
-    public class GoogleSheet : IEnumerable<GoogleSheetRow>
+    public class Sheet : IEnumerable<Row>
     {
         public int ID { get; }
         public string Name { get; }
         
-        public ICollection<GoogleSheetRow> GoogleSheetRows { get; private set; } = new List<GoogleSheetRow>();
+        public ICollection<Row> Rows { get; } = new List<Row>();
 
-        public GoogleSheet(int id, string name)
+        public Sheet(int id, string name)
         {
             ID = id;
             Name = name;
@@ -27,13 +27,13 @@ namespace Data
             {
                 var listRowIndex = rowIndex - 1;
                 
-                var row = GoogleSheetRows.ElementAtOrDefault(listRowIndex);
+                var row = Rows.ElementAtOrDefault(listRowIndex);
                 if (row == null)
                 {
-                    for (var index = GoogleSheetRows.Count; index < rowIndex; index++)
+                    for (var index = Rows.Count; index < rowIndex; index++)
                     {
-                        var newRow = new GoogleSheetRow(index, new List<Cell>());
-                        GoogleSheetRows.Add(newRow);
+                        var newRow = new Row(index, new List<Cell>());
+                        Rows.Add(newRow);
 
                         if (index == listRowIndex)
                         {
@@ -87,7 +87,7 @@ namespace Data
 
         public void Parse(IEnumerable<JToken> valuesToken)
         {
-            GoogleSheetRows.Clear();
+            Rows.Clear();
 
             for (int i = 0; i < valuesToken.Count(); i++)
             {
@@ -103,13 +103,13 @@ namespace Data
 
                     row.Add(cell);
                 }
-                GoogleSheetRows.Add(new GoogleSheetRow(i, row));
+                Rows.Add(new Row(i, row));
             }
         }
         
         public void Clear()
         {
-            GoogleSheetRows.Clear();
+            Rows.Clear();
         }
 
         private JValue GetJValueByGoogleSheetType(JToken obj)
@@ -150,9 +150,9 @@ namespace Data
             }
         }
 
-        public IEnumerator<GoogleSheetRow> GetEnumerator()
+        public IEnumerator<Row> GetEnumerator()
         {
-            return GoogleSheetRows.GetEnumerator();
+            return Rows.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()

@@ -13,13 +13,13 @@ namespace DefaultNamespace
 {
     public class GoogleDataProvider
     { 
-        public ICollection<GoogleSpreadsheet> GoogleSpreadsheets { get; } = new List<GoogleSpreadsheet>();
+        public ICollection<Spreadsheet> Spreadsheets { get; } = new List<Spreadsheet>();
         
         public Task Init() => GoogleDataStorage.Instance.RefreshAccessTokenIfExpires();
 
-        public GoogleSpreadsheet this[string spreadsheetName]
+        public Spreadsheet this[string spreadsheetName]
         {
-            get { return GoogleSpreadsheets.FirstOrDefault(item => item.Name.Equals(spreadsheetName)); }
+            get { return Spreadsheets.FirstOrDefault(item => item.Name.Equals(spreadsheetName)); }
         }
 
         public async Task CreateSpreadsheet(string spreadsheetName)
@@ -33,7 +33,7 @@ namespace DefaultNamespace
                 var jContainer = JsonConvert.DeserializeObject(str) as JContainer;
                 var id = jContainer["spreadsheetId"];
 
-                GoogleSpreadsheets.Add(new GoogleSpreadsheet(id.ToString(), spreadsheetName));
+                Spreadsheets.Add(new Spreadsheet(id.ToString(), spreadsheetName));
             });
 
             await RequestExecutor.SendRequestAsync(urlBuilder, spreadsheetCreateRequest, responseHandler);
@@ -41,7 +41,7 @@ namespace DefaultNamespace
         
         public async Task LoadSpreadsheets()
         {
-            GoogleSpreadsheets.Clear();
+            Spreadsheets.Clear();
 
             var urlBuilder = URLBuilder.GetSpreadsheets().AddOrderBy("createdTime").
                             AddRequest("mimeType = 'application/vnd.google-apps.spreadsheet' and 'me' in owners and trashed = false");
@@ -63,7 +63,7 @@ namespace DefaultNamespace
                         {
                             var fileInfo = file as JObject;
 
-                            GoogleSpreadsheets.Add(new GoogleSpreadsheet(fileInfo["id"].ToString(), fileInfo["name"].ToString()));
+                            Spreadsheets.Add(new Spreadsheet(fileInfo["id"].ToString(), fileInfo["name"].ToString()));
                         }
                     }
                 }
