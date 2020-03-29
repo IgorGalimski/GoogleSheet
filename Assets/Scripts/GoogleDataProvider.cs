@@ -15,7 +15,7 @@ namespace DefaultNamespace
     { 
         public ICollection<Spreadsheet> Spreadsheets { get; } = new List<Spreadsheet>();
         
-        public Task Init() => GoogleDataStorage.Instance.RefreshAccessTokenIfExpires();
+        public Task Init() => GoogleDataStorage.Instance.RefreshAccessToken();
 
         public Spreadsheet this[string spreadsheetName]
         {

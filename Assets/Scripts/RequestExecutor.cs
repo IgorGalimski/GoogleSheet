@@ -11,6 +11,8 @@ namespace DefaultNamespace
     {
         public static async Task SendRequestAsync(URLBuilder urlBuilder, object value, Action<string> responseHandler)
         {
+            await GoogleDataStorage.Instance.RefreshAccessToken();
+            
             var httpClient = Utils.HttpClient;
             httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             httpClient.DefaultRequestHeaders.Authorization =

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using DefaultNamespace;
 using Google.GData.Client;
 using Newtonsoft.Json.Linq;
@@ -7,7 +8,9 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "GoogleDataStorage", menuName = "GoogleDataStorage")]
 public class GoogleDataStorage : ScriptableObject
 {
-    private const int REMAINING_TIME_TO_REFRESH_ACCESS_TOKEN = 30;
+    private const int REMAINING_TIME_TO_REFRESH_ACCESS_TOKEN = 3500;
+
+    private DateTime? _lastCheck;
 
     private static GoogleDataStorage _instance;
 
@@ -77,10 +80,11 @@ public class GoogleDataStorage : ScriptableObject
 
 #endif
 
-    public async Task RefreshAccessTokenIfExpires()
+    private async Task<bool> CheckAccessTokenExpire()
     {
-        var urlBuilder = URLBuilder.CheckTokenExpires().
-            AddAccessToken(_accessToken);
+        var urlBuilder = URLBuilder
+            .CheckTokenExpires()
+            .AddAccessToken(_accessToken);
 
         using (var response = await Utils.HttpClient.GetAsync(urlBuilder.GetURL()))
         {
@@ -88,17 +92,24 @@ public class GoogleDataStorage : ScriptableObject
 
             var jObjectResponse = JObject.Parse(content);
 
-            int.TryParse((string) jObjectResponse["expires_in"], out var expiresTime);
-
-            if (expiresTime <= REMAINING_TIME_TO_REFRESH_ACCESS_TOKEN)
+            if (int.TryParse((string) jObjectResponse["expires_in"], out var expired))
             {
-                await RefreshAccessToken();
+                return expired <= 0;
             }
         }
+
+        return true;
     }
 
-    private async Task RefreshAccessToken()
+    public async Task RefreshAccessToken()
     {
+        if(_lastCheck != null && (DateTime.Now - _lastCheck.Value).Seconds < REMAINING_TIME_TO_REFRESH_ACCESS_TOKEN)
+        {
+            Debug.Log("Access token is valid");
+            
+            return;
+        }
+        
         var urlBuilder = URLBuilder.UpdateAccessToken().
             AddClientId(_clientId).
             AddClientSecret(_clientSecret).
@@ -112,6 +123,10 @@ public class GoogleDataStorage : ScriptableObject
             var jObjectResponse = JObject.Parse(content);
 
             _accessToken = (string) jObjectResponse["access_token"];
+            
+            _lastCheck = DateTime.Now;
+            
+            Debug.Log("Update access token: " + _lastCheck);
         }
     }
 }
