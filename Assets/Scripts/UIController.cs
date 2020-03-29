@@ -3,20 +3,35 @@ using System.Collections.Generic;
 using DefaultNamespace;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class UIController : MonoBehaviour
 {
     [SerializeField] 
-    private RectTransform _loadingIndicator;
+    private Button _testButton;
 
     [SerializeField] 
     private TextMeshProUGUI _logText;
 
     private readonly GoogleDataProvider _googleDataProvider = new GoogleDataProvider();
 
-    public async void Start()
+    public void OnEnable()
     {
-        var newSpreadsheetName = "NewSpreadsheet: " + DateTime.Now.ToLongTimeString();
+        Application.logMessageReceived += OnLogMessage;
+    }
+
+    public void OnDisable()
+    {
+        Application.logMessageReceived -= OnLogMessage;
+    }
+
+    public async void Test()
+    {
+        _logText.text = string.Empty;
+        
+        _testButton.enabled = false;
+
+        var newSpreadsheetName = "NewTestSpreadsheet";
         
         await _googleDataProvider.Init();
 
@@ -35,16 +50,14 @@ public class UIController : MonoBehaviour
         sheet["A1"].Value = "TestCell";
 
         await spreadSheet.Save();
+
+        _logText.text += "Finish";
+        
+        _testButton.enabled = true;
     }
 
-    public async void LoadSpreadSheets()
+    private void OnLogMessage(string condition, string stackTrace, LogType type)
     {
-        _loadingIndicator.gameObject.SetActive(true);
-        
-        await _googleDataProvider.LoadSpreadsheets();
-        
-        _loadingIndicator.gameObject.SetActive(false);
-
-        _logText.text += "SpreadSpreadshets loaded" + Environment.NewLine;
+        _logText.text += DateTime.Now.ToLongDateString() + "\t" + condition + Environment.NewLine;
     }
 }

@@ -80,7 +80,7 @@ namespace Data
                     Sheets.Add(googleSheet);
                 }
                 
-                Debug.Log(nameof(CreateSheets) + string.Concat(names, "\n"));
+                Debug.Log(nameof(CreateSheets) + string.Join("\n", names.ToArray()));
             });
 
             await RequestExecutor.SendRequestAsync(urlBuilder, value, responseHandler);
