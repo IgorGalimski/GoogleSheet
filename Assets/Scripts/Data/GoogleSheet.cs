@@ -19,42 +19,53 @@ namespace Data
             Name = name;
         }
 
-        public GoogleSheetCell this[string range]
-        {
-            get
-            {
-                if (TryGetCell(range, out var googleSheetCell))
-                {
-                    return googleSheetCell;
-                }
+        public Cell this[string range] => GetCell(range);
 
-                return null;
-            }
-            set
-            {
-                if (TryGetCell(range, out var googleSheetCell))
-                {
-                    googleSheetCell.Value = value;
-                }
-            }
-        }
-
-        private bool TryGetCell(string range, out GoogleSheetCell googleSheetCell)
+        private Cell GetCell(string range)
         {
-            googleSheetCell = null;
-            
             if (TryParseRange(range, out var columnIndex, out var rowIndex))
             {
-                var row = GoogleSheetRows.ElementAtOrDefault(rowIndex - 1);
-                if (row != null)
+                var listRowIndex = rowIndex - 1;
+                
+                var row = GoogleSheetRows.ElementAtOrDefault(listRowIndex);
+                if (row == null)
                 {
-                    googleSheetCell = row[columnIndex - 1];
+                    for (var index = GoogleSheetRows.Count; index < rowIndex; index++)
+                    {
+                        var newRow = new GoogleSheetRow(index, new List<Cell>());
+                        GoogleSheetRows.Add(newRow);
 
-                    return true;
+                        if (index == listRowIndex)
+                        {
+                            row = newRow;
+                        }
+                    }
                 }
+
+                var listCellIndex = columnIndex - 1;
+
+                var cell = row[listCellIndex];
+                if (cell == null)
+                {
+                    var cells = row.Values;
+                    
+                    for (var index = cells.Count; index < columnIndex; index++)
+                    {
+                        var newCell = new Cell();
+                        
+                        cells.Add(newCell);
+
+                        if (index == listCellIndex)
+                        {
+                            cell = newCell;
+                        }
+                    }
+                }
+
+                return cell;
             }
 
-            return false;
+            return null;
         }
 
         private bool TryParseRange(string range, out int columnIndex, out int rowIndex)
@@ -82,10 +93,10 @@ namespace Data
             {
                 var jToken = valuesToken.ElementAt(i);
                 
-                var row = new List<GoogleSheetCell>();
+                var row = new List<Cell>();
                 foreach (var value in jToken)
                 {
-                    var cell = new GoogleSheetCell
+                    var cell = new Cell
                     {
                         Value = GetJValueByGoogleSheetType(value)
                     };

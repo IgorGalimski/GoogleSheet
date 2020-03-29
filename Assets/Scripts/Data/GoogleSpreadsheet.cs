@@ -58,7 +58,7 @@ namespace Data
             await ReadGoogleSheets();
         }
 
-        public async Task CreateGoogleSheets(ICollection<string> names)
+        public async Task CreateSheets(ICollection<string> names)
         {
             var urlBuilder = URLBuilder.BatchUpdate(ID);
             var value = AddSheetRequestBodyAdapter.GetAddSheetRequestBody(names);
@@ -80,7 +80,7 @@ namespace Data
                     GoogleSheets.Add(googleSheet);
                 }
                 
-                Debug.Log(nameof(CreateGoogleSheets));
+                Debug.Log(nameof(CreateSheets) + string.Concat(names, "\n"));
             });
 
             await RequestExecutor.SendRequestAsync(urlBuilder, value, responseHandler);

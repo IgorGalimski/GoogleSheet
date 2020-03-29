@@ -1,6 +1,6 @@
 namespace Data
 {
-    public class GoogleSheetCell
+    public class Cell
     {
         public object Value { get; set; }
     }

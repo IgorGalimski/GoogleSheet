@@ -4,21 +4,21 @@ using System.Linq;
 
 namespace Data
 {
-    public class GoogleSheetRow : IEnumerable<GoogleSheetCell>
+    public class GoogleSheetRow : IEnumerable<Cell>
     {
         public int Index { get; }
 
-        public ICollection<GoogleSheetCell> Values { get; }
+        public ICollection<Cell> Values { get; }
 
-        public GoogleSheetRow(int index, ICollection<GoogleSheetCell> values)
+        public GoogleSheetRow(int index, ICollection<Cell> values)
         {
             Index = index;
             Values = values;
         }
 
-        public GoogleSheetCell this[int index] => Values.ElementAtOrDefault(index);
+        public Cell this[int index] => Values.ElementAtOrDefault(index);
 
-        public IEnumerator<GoogleSheetCell> GetEnumerator()
+        public IEnumerator<Cell> GetEnumerator()
         {
             return Values.GetEnumerator();
         }
