@@ -14,6 +14,8 @@ namespace DefaultNamespace
     public class GoogleDataProvider
     { 
         public ICollection<GoogleSpreadsheet> GoogleSpreadsheets { get; } = new List<GoogleSpreadsheet>();
+        
+        public Task Init() => GoogleDataStorage.Instance.RefreshAccessTokenIfExpires();
 
         public GoogleSpreadsheet this[string spreadsheetName]
         {
@@ -39,8 +41,6 @@ namespace DefaultNamespace
         
         public async Task LoadSpreadsheets()
         {
-            await GoogleDataStorage.Instance.RefreshAccessTokenIfExpires();
-            
             GoogleSpreadsheets.Clear();
 
             var urlBuilder = URLBuilder.GetSpreadsheets().AddOrderBy("createdTime").
