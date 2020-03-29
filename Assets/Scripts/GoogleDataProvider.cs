@@ -13,7 +13,7 @@ namespace DefaultNamespace
 {
     public class GoogleDataProvider
     { 
-        public ICollection<GoogleSpreadsheet> GoogleSpreadsheets { get; private set; } = new List<GoogleSpreadsheet>();
+        public ICollection<GoogleSpreadsheet> GoogleSpreadsheets { get; } = new List<GoogleSpreadsheet>();
 
         public GoogleSpreadsheet this[string spreadsheetName]
         {
@@ -27,6 +27,11 @@ namespace DefaultNamespace
             var responseHandler = new Action<string>(str =>
             {
                 Debug.Log(nameof(CreateSpreadsheet) + spreadsheetName);
+                
+                var jContainer = JsonConvert.DeserializeObject(str) as JContainer;
+                var id = jContainer["spreadsheetId"];
+
+                GoogleSpreadsheets.Add(new GoogleSpreadsheet(id.ToString(), spreadsheetName));
             });
 
             await RequestExecutor.SendRequestAsync(urlBuilder, spreadsheetCreateRequest, responseHandler);
