@@ -17,7 +17,7 @@ namespace DefaultNamespace
         private readonly string _clientId;
         private readonly string _clientSecret;
         
-        private OAuth2Parameters _parameters;
+        //private OAuth2Parameters _parameters;
         
         public GoogleApiAuth(string clientId, string clientSecret)
         {
@@ -29,18 +29,7 @@ namespace DefaultNamespace
         {
             try
             {
-                _parameters = new OAuth2Parameters
-                {
-                    ClientId = _clientId,
-                    ClientSecret = _clientSecret,
-                    Scope = SCOPE,
-                    RedirectUri = REDIRECT_URI,
-                    AccessType = "offline",
-                    TokenType = "Bearer"
-                };
-
-                var authorizationUrl = OAuthUtil.CreateOAuth2AuthorizationUrl(_parameters);
-                Application.OpenURL(authorizationUrl);
+                
             }
             catch (Exception exception)
             {
@@ -54,11 +43,11 @@ namespace DefaultNamespace
             {
                 ServicePointManager.ServerCertificateValidationCallback = RemoteCertificateValidationCallback;
 
-                _parameters.AccessCode = accessCode;
+                //_parameters.AccessCode = accessCode;
 
-                OAuthUtil.GetAccessToken(_parameters);
+                //OAuthUtil.GetAccessToken(_parameters);
 
-                return (_parameters.AccessToken, _parameters.RefreshToken);
+                //return (_parameters.AccessToken, _parameters.RefreshToken);
             }
             catch (Exception exception)
             {
